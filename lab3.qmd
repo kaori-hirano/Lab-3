@@ -1,0 +1,164 @@
+---
+title: "Lab 3: Cross Validation and Model Flexibility"
+author: "Insert your name here"
+date: "Insert date here"
+format: pdf
+---
+
+# Packages
+
+```{r load-packages}
+# load packages here
+```
+
+# Data Simulation 
+
+```{r simulate-data}
+# set seed for replicability purposes
+set.seed(280)
+# the number of observations in our data set
+n <- 1000
+# x1 ~ beta(1.1, 1.1) * 20 - 10 (constrained to between -10 and 10)
+x1 <- rbeta(n, shape1 = 1.1, shape2 = 1.1) * 20 - 10 
+
+
+# Simulating n y1 values
+y1 <- 2 + x1 - 0.012 * x1^2 + rnorm(n, mean = 0, sd = 1)
+# And doing the same with y2
+y2 <- 2 + sin(1.5 * sin(1.2 * x1) + 0.5 * cos(0.5 * (x1 - 1)^2)) + 0.3 * x1 +
+  rnorm(n, mean = 0, sd = 1)
+
+
+# putting all in a tibble
+sim_data <- tibble(x1 = x1,
+                   y1 = y1,
+                   y2 = y2)
+```
+
+# Models
+
+```{r mse-function}
+# function takes two arguments:
+## true - the true Y values
+## pred - the predicted Y values
+## observations in true and pred *must* be in same order
+calc_mse <- function(true, pred, subset = NULL){
+  error <- (true - pred)^2
+  if(!is.null(subset)) error <- error[subset]
+  mean(error)
+}
+# note that R functions don't need return statement - last object evaluated in
+# function body gets returned
+```
+
+# Data Visualization
+
+## Q1 
+
+```{r chunk-name-here}
+# code here
+```
+
+# Validation Set Variance
+
+## Q2 
+
+## Q3
+
+```{r predictions-gbm}
+#| eval: false
+# remember to remove eval: true when you get to this chunk while working
+# through the lab!
+
+# function to calculate predicted values
+predict_gbm <- function(y_train, x_train, x_val){
+  
+  df_test <- data.frame(y = y_train,
+                        x = x_train)
+  
+  boost_model <- gbm(y ~ x,
+                     data = df_test,
+                     interaction.depth = 1,
+                     n.minobsinnode = as.integer(.05 * length(y_train)),
+                     n.trees = 500,
+                     shrinkage = .1,
+                     bag.fraction = 1,
+                     distribution = "gaussian")
+  
+  df_val <- data.frame(x = x_val)
+  
+  boost_pred <- predict(boost_model, newdata = df_val,
+                        n.trees = 500)
+  boost_pred
+}
+
+# fitting the two gbm models
+y1_gbm_pred <- predict_gbm(sim_data$y1[train_index],
+                           sim_data$x1[train_index], 
+                           sim_data$x1[-train_index])
+y2_gbm_pred <- predict_gbm(sim_data$y2[train_index],
+                           sim_data$x1[train_index],
+                           sim_data$x1[-train_index])
+```
+
+## Q4
+
+```{r}
+#| eval: false
+# remember to remove eval: true when you get to this chunk while working
+# through the lab!
+
+# linear function
+# insert code from Q1 here
+# don't forget the +'s!
+# drawing GBM predicted curve
+  geom_function(aes(color = "GBM Model"), 
+                    fun = predict_gbm, 
+                args = list(x_train = sim_data$x1[train_index],
+                            y_train = sim_data$y1[train_index]),
+                linewidth = 1.25)
+
+# nonlinear function
+# insert code from Q1 here
+# don't forget the +'s!
+# drawing GBM predicted curve
+  geom_function(aes(color = "GBM Model"), 
+                    fun = predict_gbm, 
+                args = list(x_train = sim_data$x1[train_index],
+                            y_train = sim_data$y2[train_index]),
+                linewidth = 1.25)
+```
+
+## Q5
+
+# K-Fold Cross Validation
+
+## Q6
+
+## Q7
+
+```{r cv-gbm}
+#| eval: false
+#| warning: false
+# remember to remove eval: true when you get to this chunk while working
+# through the lab!
+
+# gbm has bug when cross-validating with a single predictor
+# so we are adding a non-informative predictor
+# gbm throws a warning, but it's their bug! 
+sim_data$x2 <- 0
+
+set.seed(4)
+y1_gbm_cv <- gbm(y1 ~ x1 + x2,
+                     data = sim_data,
+                     interaction.depth = 1,
+                     n.minobsinnode = 5,
+                     n.trees = 500,
+                     shrinkage = .1,
+                     bag.fraction = 1,
+                     cv.folds = 10,
+                     distribution = "gaussian")$cv.error[500]
+```
+
+
+
