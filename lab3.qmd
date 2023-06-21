@@ -1,14 +1,17 @@
 ---
 title: "Lab 3: Cross Validation and Model Flexibility"
-author: "Insert your name here"
-date: "Insert date here"
+author: "Kaori Hirano"
+date: "21/06/2023"
 format: pdf
 ---
 
 # Packages
 
 ```{r load-packages}
-# load packages here
+library(plyr)
+suppressPackageStartupMessages(library(tidyverse))
+library(boot)
+suppressPackageStartupMessages(library(gbm))
 ```
 
 # Data Simulation 
@@ -62,6 +65,9 @@ calc_mse <- function(true, pred, subset = NULL){
 # Validation Set Variance
 
 ## Q2 
+```{r chunk-name-here}
+# code here
+```
 
 ## Q3
 
@@ -130,10 +136,16 @@ y2_gbm_pred <- predict_gbm(sim_data$y2[train_index],
 ```
 
 ## Q5
+```{r chunk-name-here}
+# code here
+```
 
 # K-Fold Cross Validation
 
 ## Q6
+```{r chunk-name-here}
+# code here
+```
 
 ## Q7
 
