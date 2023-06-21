@@ -87,9 +87,8 @@ ggplot(sim_data, aes(x1, y2)) +
 ## Q2 
 ```{r create-set}
 set.seed(1) 
-# take 196 samples without replacement from the vector 1:392
-train <- sample(392, 294)
-length(train)
+# take 294 samples without replacement from the vector 1:392
+train <- sample(392, 294) # assigns 25% to validation, rest to test
 ```
 
 ## Q3
@@ -98,17 +97,12 @@ my1 <- glm(y1 ~ x1, data = sim_data, subset = train)
 
 my2 <- glm(y2 ~ x1, data = sim_data, subset = train)
 
-calc_mse <- function(true, pred, subset = NULL){
-  error <- (true - pred)^2
-  if(!is.null(subset)) error <- error[subset]
-  mean(error)
-}
+y1_linear_mse <- calc_mse(sim_data$y1, predict(my1, sim_data), -train)
 
-(y1_linear_mse <- calc_mse(sim_data$y1, predict(my1, sim_data), -train))
-
-(y2_linear_mse <- calc_mse(sim_data$y2, predict(my2, sim_data), -train))
-
+y2_linear_mse <- calc_mse(sim_data$y2, predict(my2, sim_data), -train)
 ```
+y1 linear mse = 1.090
+y2 linear mse = 1.569
 
 ```{r predictions-gbm}
 
@@ -138,6 +132,7 @@ predict_gbm <- function(y_train, x_train, x_val){
 y1_gbm_pred <- predict_gbm(sim_data$y1[train_index],
                            sim_data$x1[train_index], 
                            sim_data$x1[-train_index])
+
 y2_gbm_pred <- predict_gbm(sim_data$y2[train_index],
                            sim_data$x1[train_index],
                            sim_data$x1[-train_index])
