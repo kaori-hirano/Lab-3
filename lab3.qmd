@@ -185,11 +185,12 @@ cbind(y1_linear_mse, y1_gbm_mse, y2_linear_mse, y2_gbm_mse)
 ```{r chunk-name-here}
 # code here
 ```
+The GBM is better than the linear model for nonlinear data. 
 
 ## Q7
 
 ```{r cv-gbm}
-#| eval: false
+#| eval: true
 #| warning: false
 # remember to remove eval: true when you get to this chunk while working
 # through the lab!
@@ -209,7 +210,11 @@ y1_gbm_cv <- gbm(y1 ~ x1 + x2,
                      bag.fraction = 1,
                      cv.folds = 10,
                      distribution = "gaussian")$cv.error[500]
-```
 
+y1_gbm_cv
+```
+a) 
+
+b) In this case, we don't care a lot about interpretability considering we haven't even named our variables beyond x and y. Because we aren't trying to make interpretations from the data and are just concerned about finding the best fit, favoring flexibility even though it takes longer is preferred in this case. 
 
 
