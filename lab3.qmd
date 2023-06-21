@@ -81,16 +81,32 @@ ggplot(sim_data, aes(x1, y2)) +
 # Validation Set Variance
 
 ## Q2 
-```{r chunk-name-here}
-# code here
+```{r create-set}
+set.seed(1) 
+# take 196 samples without replacement from the vector 1:392
+train <- sample(392, 294)
+length(train)
 ```
 
 ## Q3
+```{r predictions-glm}
+my1 <- glm(y1 ~ x1, data = sim_data, subset = train)
+
+my2 <- glm(y2 ~ x1, data = sim_data, subset = train)
+
+calc_mse <- function(true, pred, subset = NULL){
+  error <- (true - pred)^2
+  if(!is.null(subset)) error <- error[subset]
+  mean(error)
+}
+
+y1_linear_mse <- calc_mse(sim_data$y1, predict(my1, sim_data), -train)
+
+y2_linear_mse <- calc_mse(sim_data$y2, predict(my2, sim_data), -train)
+
+```
 
 ```{r predictions-gbm}
-#| eval: false
-# remember to remove eval: true when you get to this chunk while working
-# through the lab!
 
 # function to calculate predicted values
 predict_gbm <- function(y_train, x_train, x_val){
@@ -121,8 +137,16 @@ y1_gbm_pred <- predict_gbm(sim_data$y1[train_index],
 y2_gbm_pred <- predict_gbm(sim_data$y2[train_index],
                            sim_data$x1[train_index],
                            sim_data$x1[-train_index])
+
+y1_gbm_mse <- calc_mse(sim_data$y1, predict(y1_gbm_pred, sim_data), -train)
+
+y2_gbm_mse <- calc_mse(sim_data$y2, predict(y2_gbm_pred, sim_data), -train)
 ```
 
+```{r comparing-mses}
+cbind(y1_linear_mse, y1_gbm_mse, y2_linear_mse, y2_gbm_mse)
+# something has gone wrong and this won't display, leading me t think there's an error in the code prior
+```
 ## Q4
 
 ```{r}
