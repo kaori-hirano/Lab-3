@@ -58,8 +58,24 @@ calc_mse <- function(true, pred, subset = NULL){
 
 ## Q1 
 
-```{r chunk-name-here}
-# code here
+```{r q1}
+# use hollow-point scatterplot to vis x1 and y1 and y2
+
+ggplot(sim_data, aes(x1, y1)) + 
+  geom_point(shape = 1) + 
+  labs(title = "Relationship between x1 and y1") + 
+  geom_function(fun = function(x){x}) + 
+  theme_minimal() +
+  geom_line(linewidth = 1.25)
+
+ggplot(sim_data, aes(x1, y2)) + 
+  geom_point(shape = 1) + 
+  labs(title = "Relationship between x1 and y2") + 
+  geom_function(fun = function(x){x}) + 
+  theme_minimal() +
+  geom_line(linewidth = 1.25)
+
+# fix line width problem, describe two relationships
 ```
 
 # Validation Set Variance
