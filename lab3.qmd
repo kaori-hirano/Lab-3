@@ -59,21 +59,25 @@ calc_mse <- function(true, pred, subset = NULL){
 ## Q1 
 
 ```{r q1}
-# use hollow-point scatterplot to vis x1 and y1 and y2
+y1_fun <- function(x1){
+  2 + x1 - 0.012 * x1^2
+}
 
 ggplot(sim_data, aes(x1, y1)) + 
-  geom_point(shape = 1) + 
+  geom_point(shape = 1, alpha = .5) + 
   labs(title = "Relationship between x1 and y1") + 
-  geom_function(fun = function(x){x}) + 
-  theme_minimal() +
-  geom_line(linewidth = 1.25)
+  geom_function(fun = y1_fun, linewidth = 1.25) + 
+  theme_minimal() 
+
+y2_fun <- function(x1){ 2 + sin(1.5 * sin(1.2 * x1) + 0.5 * cos(0.5 * (x1 - 1)^2)) + 0.3 * x1
+  }
 
 ggplot(sim_data, aes(x1, y2)) + 
-  geom_point(shape = 1) + 
+  geom_point(shape = 1, alpha = .5) + 
   labs(title = "Relationship between x1 and y2") + 
-  geom_function(fun = function(x){x}) + 
-  theme_minimal() +
-  geom_line(linewidth = 1.25)
+  geom_function(fun = y2_fun, linewidth = 1.25) + 
+  theme_minimal() #+
+ # geom_line(linewidth = 1.25)
 
 # fix line width problem, describe two relationships
 ```
@@ -100,9 +104,9 @@ calc_mse <- function(true, pred, subset = NULL){
   mean(error)
 }
 
-y1_linear_mse <- calc_mse(sim_data$y1, predict(my1, sim_data), -train)
+(y1_linear_mse <- calc_mse(sim_data$y1, predict(my1, sim_data), -train))
 
-y2_linear_mse <- calc_mse(sim_data$y2, predict(my2, sim_data), -train)
+(y2_linear_mse <- calc_mse(sim_data$y2, predict(my2, sim_data), -train))
 
 ```
 
@@ -146,11 +150,11 @@ y2_gbm_mse <- calc_mse(sim_data$y2, predict(y2_gbm_pred, sim_data), -train)
 ```{r comparing-mses}
 cbind(y1_linear_mse, y1_gbm_mse, y2_linear_mse, y2_gbm_mse)
 # something has gone wrong and this won't display, leading me t think there's an error in the code prior
+#NOT DONE
 ```
 ## Q4
 
-```{r}
-#| eval: false
+```{r q4}
 # remember to remove eval: true when you get to this chunk while working
 # through the lab!
 
