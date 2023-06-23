@@ -63,16 +63,17 @@ y1_fun <- function(x1){
   2 + x1 - 0.012 * x1^2
 }
 
-ggplot(sim_data, aes(x1, y1)) + 
+ggplot(sim_data, aes(x1, y1)) + # first graph, linear
   geom_point(shape = 1, alpha = .5) + 
   labs(title = "Relationship between x1 and y1") + 
   geom_function(fun = y1_fun, linewidth = 1.25) + 
   theme_minimal() 
 
-y2_fun <- function(x1){ 2 + sin(1.5 * sin(1.2 * x1) + 0.5 * cos(0.5 * (x1 - 1)^2)) + 0.3 * x1
+y2_fun <- function(x1){ 2 + sin(1.5 * sin(1.2 * x1) + 0.5 * 
+                                  cos(0.5 * (x1 - 1)^2)) + 0.3 * x1
   }
 
-ggplot(sim_data, aes(x1, y2)) + 
+ggplot(sim_data, aes(x1, y2)) + # second graph, nonlinear
   geom_point(shape = 1, alpha = .5) + 
   labs(title = "Relationship between x1 and y2") + 
   geom_function(fun = y2_fun, linewidth = 1.25) + 
@@ -154,33 +155,30 @@ This is also true in the second case, although the gbm is closer to the linear m
 # remember to remove eval: true when you get to this chunk while working
 # through the lab!
 
-# linear function
-# drawing GBM predicted curve
-
 ggplot(sim_data, aes(x1, y1)) + 
   geom_point(shape = 1, alpha = .5) + 
+  geom_function(fun = y1_fun, linewidth = 1.25, color = 'black') + 
   labs(title = "Relationship between x1 and y1") + 
   geom_function(aes(color = "GBM Model"), 
                     fun = predict_gbm, 
                 args = list(x_train = sim_data$x1[train],
                             y_train = sim_data$y1[train]),
                 linewidth = 1.25) +
-  theme_minimal() +
-  geom_function(fun = y1_fun, linewidth = 1, color = 'orchid4')
+  theme_minimal() 
 # adds true function
 
 # nonlinear function
 # drawing GBM predicted curve
 ggplot(sim_data, aes(x1, y2)) + 
   geom_point(shape = 1, alpha = .5) + 
+  geom_function(fun = y2_fun, linewidth = 1.25, color = "black")+
   labs(title = "Relationship between x1 and y2") + 
   geom_function(aes(color = "GBM Model"), 
                     fun = predict_gbm, 
                 args = list(x_train = sim_data$x1[train],
                             y_train = sim_data$y2[train]),
                 linewidth = 1.25) + 
-  theme_minimal() +
-   geom_function(fun = y2_fun, linewidth = 1, color = "darkorchid4") # adds true function line
+  theme_minimal()  # adds true function line
 ```
 The first one is far more reactive to small changes in the data than the linear model, which isn't necessarily a good thing. The second gbm is very similar to the second graph created in question 1. 
 
@@ -202,7 +200,7 @@ y1_linear_mse2 <- calc_mse(sim_data$y1, predict(my1, sim_data), -train2)
 y2_linear_mse2 <- calc_mse(sim_data$y2, predict(my2, sim_data), -train2)
 ```
 
-```{r predictions-gbm}
+```{r predictions-gbm2}
 #| warning: false
 # function to calculate predicted values
 predict_gbm <- function(y_train2, x_train2, x_val){
@@ -240,7 +238,7 @@ y1_gbm_mse2 <- calc_mse(sim_data$y1, y1_gbm_pred2, -train2)
 y2_gbm_mse2 <- calc_mse(sim_data$y2, y2_gbm_pred2, -train2)
 ```
 
-```{r comparing-mses}
+```{r comparing-mses2}
 cbind(y1_linear_mse2, y1_gbm_mse2) 
 cbind(y2_linear_mse2, y2_gbm_mse2) # this doesn't seem right
 ```
@@ -251,9 +249,7 @@ They don't tell an altogether different story.
 # K-Fold Cross Validation
 
 ## Q6
-Based on what I got there isn't much of a reason to use cross validation, but I'm assuming that the results were supposed to conflict? Cross validation would help by further splitting up the data and having more train cases.
-Using cross validation will help us get a better picture of what fits the data better
-by allowing us to use more cases to train with. 
+Cross validation would help by further splitting up the data and having more train cases. It doesn't quite make sense that a linear model would be that much better at predicting nonlinear data than the gbm which should be better in the nonlinear data, so cross validation could help us see whether or not that is actually the case and will help us get a better picture of what fits the data better. 
 
 ## Q7
 
@@ -269,8 +265,9 @@ by allowing us to use more cases to train with.
 set.seed(4)
 sim_data$x2 <- 0
 
-my12 <- glm(y1 ~ x1, data = sim_data)
-glm_cv <- cv.glm(sim_data, my12, K = 10)
+y1_linear_mse 
+my12 <- glm(y1 ~ x1, data = sim_data) # refits with full data
+glm_cv <- cv.glm(sim_data, my12, K = 10) # cross validation
 glm_cv$delta
 
 y1_gbm_cv <- gbm(y1 ~ x1 + x2,
@@ -283,8 +280,7 @@ y1_gbm_cv <- gbm(y1 ~ x1 + x2,
                      cv.folds = 10,
                      distribution = "gaussian")$cv.error[500]
 
-y1_gbm_cv
-y1_linear_mse
+y1_gbm_cv # mse
 ```
 a) The MSE for the GBM is 1.023 which is lower than that of the linear model for the same set of data so the gbm seems to fit better. This is only slightly lower than the linear one, however. 
 
